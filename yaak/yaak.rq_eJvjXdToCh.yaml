@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_eJvjXdToCh
 createdAt: 2025-05-19T08:05:07.588673700
-updatedAt: 2025-05-19T08:21:28.146236200
+updatedAt: 2025-05-19T10:48:40.241364800
 workspaceId: wk_6mRMT4yPtm
 folderId: fl_iE8G92PhrS
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "id": "",
+      "id": "4f7c709a-a913-4dc2-a5df-f3d8f00c5ecc",
       "brand": "Brand",
       "model": "Model",
       "serialNumber": "SN",
@@ -27,5 +27,5 @@ headers:
 method: PUT
 name: Update Bike
 sortPriority: 3500.0
-url: http://localhost:5074/api/bikes/214601a1-cc3a-432d-b33e-f2abd913ec7c
+url: http://localhost:5074/api/bikes/4f7c709a-a913-4dc2-a5df-f3d8f00c5ecc
 urlParameters: []

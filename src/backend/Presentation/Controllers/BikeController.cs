@@ -43,6 +43,7 @@ public class BikeController(BikeService bikeService) : Controller
     {
         if (id != updateBike.Id)
             return BadRequest();
+            
         var bike = new Bike()
         {
             Id = updateBike.Id,
@@ -52,6 +53,7 @@ public class BikeController(BikeService bikeService) : Controller
             Year = updateBike.Year,
             BikeType = Enum.Parse<BikeType>(updateBike.BikeType)
         };
+
         await bikeService.UpdateBike(bike);
         return NoContent();
     }

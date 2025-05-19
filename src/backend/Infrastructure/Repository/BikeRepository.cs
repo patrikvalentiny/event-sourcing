@@ -1,8 +1,9 @@
-using System;
-using System.Threading.Tasks;
 using backend.Domain.Entities;
+using backend.Domain.Events;
+using backend.Domain.Events.BikeEvents;
 using backend.Infrastructure.Context;
 using Marten;
+using Marten.Events;
 
 namespace backend.Infrastructure.Repository;
 
@@ -15,45 +16,45 @@ public class BikeRepository(MartenContext martenContext)
         return bikes;
     }
 
-    public async Task<Bike?> GetBySerialNumber(string serialNumber)
+
+
+    
+    public async Task<Bike?> Get(Guid id)
+    {
+        using var session = martenContext.GetQuerySession();
+        var bikeStream = await session.Events.AggregateStreamAsync<Bike>(id);
+        return bikeStream;
+    }
+
+       public async Task<Bike?> GetBySerialNumber(string serialNumber)
     {
         using var session = martenContext.GetQuerySession();
         var bike = await session.Query<Bike>().FirstOrDefaultAsync(b => b.SerialNumber == serialNumber);
         return bike;
     }
 
-    public async Task Add(Bike bike)
+    public async Task Add(BikeRegistered bike)
     {
         using var session = martenContext.GetLightweightSession();
-        session.Store(bike);
+        session.Events.StartStream<Bike>(bike.Id, bike);
         await session.SaveChangesAsync();
     }
 
-    public async Task<Bike?> Get(Guid id)
-    {
-        using var session = martenContext.GetQuerySession();
-        var bike = await session.LoadAsync<Bike>(id);
-        return bike;
-    }
 
-    public async Task Update(Bike bike)
+    public async Task Update(BikeUpdated bikeUpdated)
     {
         using var session = martenContext.GetLightweightSession();
-        session.Update(bike);
+        session.Events.Append(bikeUpdated.Id, bikeUpdated);
         await session.SaveChangesAsync();
     }
 
-    public async Task<bool> Delete(Guid id)
+    public async Task<bool> Delete(BikeDeleted bikeDeleted)
     {
         using var session = martenContext.GetLightweightSession();
-        var bike = await session.LoadAsync<Bike>(id);
-        if (bike != null)
-        {
-            session.Delete(bike);
-            await session.SaveChangesAsync();
-            return true;
-        }
-        return false;
+        session.Events.Append(bikeDeleted.Id, bikeDeleted);
+        session.Events.ArchiveStream(bikeDeleted.Id);
+        await session.SaveChangesAsync();
+        return true;
     }
 
 }

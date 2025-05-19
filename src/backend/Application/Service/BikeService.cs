@@ -1,5 +1,7 @@
 using System;
 using backend.Domain.Entities;
+using backend.Domain.Events;
+using backend.Domain.Events.BikeEvents;
 using backend.Infrastructure.Repository;
 
 namespace backend.Application.Service;
@@ -13,30 +15,39 @@ public class BikeService(BikeRepository bikeRepository)
 
     public async Task RegisterBike(string brand, string model, string serialNumber, int year, string bikeType)
     {
-        var bike = new Bike()
-        {
-            Id = Guid.NewGuid(),
-            Brand = brand,
-            Model = model,
-            SerialNumber = serialNumber,
-            Year = year,
-            BikeType = Enum.Parse<BikeType>(bikeType)
-        };
-        await bikeRepository.Add(bike);
+        var bikeRegistered = new BikeRegistered(
+            Guid.NewGuid(),
+            brand,
+            model,
+            serialNumber,
+            year,
+            Enum.Parse<BikeType>(bikeType)
+        );
+        await bikeRepository.Add(bikeRegistered);
     }
 
     public async Task<Bike?> GetBike(Guid id)
     {
-        return await bikeRepository.Get(id);
+        var bike = await bikeRepository.Get(id);
+        return bike;
     }
 
     public async Task UpdateBike(Bike bike)
     {
-        await bikeRepository.Update(bike);
+        var bikeUpdated = new BikeUpdated(
+            bike.Id,
+            bike.Brand,
+            bike.Model,
+            bike.SerialNumber,
+            bike.Year,
+            bike.BikeType            
+        );
+        await bikeRepository.Update(bikeUpdated);
     }
 
     public async Task<bool> DeleteBike(Guid id)
     {
-        return await bikeRepository.Delete(id);
+        var bikeDeleted = new BikeDeleted(id);
+        return await bikeRepository.Delete(bikeDeleted);
     }
 }

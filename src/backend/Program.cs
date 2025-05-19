@@ -2,6 +2,8 @@ using backend.Application.Service;
 using backend.Infrastructure.Context;
 using backend.Infrastructure.Repository;
 using Marten;
+using Marten.Events;
+using Marten.Events.Schema;
 using Scalar.AspNetCore;
 using Serilog;
 using Weasel.Core;
@@ -24,8 +26,6 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 
-// This is the absolute, simplest way to integrate Marten into your
-// .NET application with Marten's default configuration
 builder.Services.AddMarten(options =>
 {
     // Establish the connection string to your Marten database
@@ -33,6 +33,12 @@ builder.Services.AddMarten(options =>
 
     // Specify that we want to use STJ as our serializer
     options.UseSystemTextJsonForSerialization();
+
+    // Lighter weight mode that should result in better
+    // performance, but with a loss of available metadata
+    // within inline projections
+    options.Events.AppendMode = EventAppendMode.Quick;
+    options.Events.UseMandatoryStreamTypeDeclaration = true;
 
     // If we're running in development mode, let Marten just take care
     // of all necessary schema building and patching behind the scenes
