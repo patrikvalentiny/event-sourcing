@@ -1,8 +1,11 @@
 using backend.Application.Service;
+using backend.Infrastructure.Aggregations;
 using backend.Infrastructure.Context;
 using backend.Infrastructure.Repository;
 using Marten;
 using Marten.Events;
+using Marten.Events.Daemon.Resiliency;
+using Marten.Events.Projections;
 using Marten.Events.Schema;
 using Scalar.AspNetCore;
 using Serilog;
@@ -40,6 +43,8 @@ builder.Services.AddMarten(options =>
     options.Events.AppendMode = EventAppendMode.Quick;
     options.Events.UseMandatoryStreamTypeDeclaration = true;
 
+    options.Projections.Add<BikeAggregation>(ProjectionLifecycle.Inline);
+
     // If we're running in development mode, let Marten just take care
     // of all necessary schema building and patching behind the scenes
     if (builder.Environment.IsDevelopment())
@@ -57,7 +62,6 @@ var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
-//TODO: Uncomment the following line to disable the OpenAPI UI in production mode
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_2Rwe7TTMY4
 createdAt: 2025-05-19T07:51:07.786050700
-updatedAt: 2025-05-19T08:16:07.007300500
+updatedAt: 2025-05-19T13:35:52.737622500
 workspaceId: wk_6mRMT4yPtm
 folderId: fl_iE8G92PhrS
 authentication: {}
@@ -11,7 +11,7 @@ body:
   text: |-
     {
       "brand": "Canyon",
-      "model": "Endurace",
+      "model": "Endurace2",
       "serialNumber": "${[ faker.string.uuid() ]}",
       "year": 2025,
       "bikeType": "Road"
