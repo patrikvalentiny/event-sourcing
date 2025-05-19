@@ -1,0 +1,31 @@
+type: http_request
+model: http_request
+id: rq_eJvjXdToCh
+createdAt: 2025-05-19T08:05:07.588673700
+updatedAt: 2025-05-19T08:21:28.146236200
+workspaceId: wk_6mRMT4yPtm
+folderId: fl_iE8G92PhrS
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "id": "",
+      "brand": "Brand",
+      "model": "Model",
+      "serialNumber": "SN",
+      "year": 1,
+      "bikeType": "Road"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+method: PUT
+name: Update Bike
+sortPriority: 3500.0
+url: http://localhost:5074/api/bikes/214601a1-cc3a-432d-b33e-f2abd913ec7c
+urlParameters: []

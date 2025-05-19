@@ -1,0 +1,18 @@
+type: http_request
+model: http_request
+id: rq_9XbchwmcQ2
+createdAt: 2025-05-19T07:17:41.935730300
+updatedAt: 2025-05-19T08:16:13.184095600
+workspaceId: wk_6mRMT4yPtm
+folderId: fl_iE8G92PhrS
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get All Bikes
+sortPriority: 500.0
+url: http://localhost:5074/api/bikes
+urlParameters: []

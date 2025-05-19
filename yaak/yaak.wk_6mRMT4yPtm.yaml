@@ -1,0 +1,10 @@
+type: workspace
+model: workspace
+id: wk_6mRMT4yPtm
+createdAt: 2025-05-19T07:16:35.748445300
+updatedAt: 2025-05-19T07:16:44
+name: event-sourcing
+description: ''
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0

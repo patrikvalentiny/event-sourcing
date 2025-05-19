@@ -1,0 +1,30 @@
+type: http_request
+model: http_request
+id: rq_2Rwe7TTMY4
+createdAt: 2025-05-19T07:51:07.786050700
+updatedAt: 2025-05-19T08:16:07.007300500
+workspaceId: wk_6mRMT4yPtm
+folderId: fl_iE8G92PhrS
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "brand": "Canyon",
+      "model": "Endurace",
+      "serialNumber": "${[ faker.string.uuid() ]}",
+      "year": 2025,
+      "bikeType": "Road"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+method: POST
+name: Create Bike
+sortPriority: 3000.0
+url: http://localhost:5074/api/bikes
+urlParameters: []

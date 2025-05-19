@@ -1,0 +1,18 @@
+type: http_request
+model: http_request
+id: rq_TeyRNPaREa
+createdAt: 2025-05-19T08:15:24.932133400
+updatedAt: 2025-05-19T08:21:39.389144
+workspaceId: wk_6mRMT4yPtm
+folderId: fl_iE8G92PhrS
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: DELETE
+name: Delete Bike
+sortPriority: 4000.0
+url: http://localhost:5074/api/bikes/49076944-be80-48f0-bd3c-6a9e628b41d3
+urlParameters: []
