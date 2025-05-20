@@ -1,8 +1,5 @@
 using backend.Infrastructure.Repository;
 using backend.Domain.Entities;
-using System;
-using System.Threading.Tasks;
-using Serilog;
 
 namespace backend.Application.Service;
 
@@ -19,42 +16,15 @@ public class ComponentService(ComponentRepository componentRepository)
         await componentRepository.Add(component);
     }
 
-    public async Task IncreaseComponentDistance(Guid componentId, int mileage, Guid rideId)
+    public async Task IncreaseComponentDistance(Guid componentId, double distance, Guid rideId)
     {
-        await componentRepository.IncreaseDistance(componentId, mileage, rideId);
+        await componentRepository.IncreaseDistance(componentId, distance, rideId);
     }
 
-    // Assuming GetAllComponents, UpdateComponent, DeleteComponent methods exist or will be added
-    // For example:
-    public async Task<IEnumerable<BikeComponent>> GetAllComponents(Guid bikeId)
+    public async Task LogRideForBikeComponentsAsync(Guid bikeId, double distance)
     {
-        // This would require a corresponding method in ComponentRepository
-        // e.g., return await componentRepository.GetAllByBikeId(bikeId);
-        // For now, returning an empty list as the repository method is not provided.
-        return await Task.FromResult(new List<BikeComponent>().AsEnumerable());
-    }
-
-    public async Task UpdateComponent(BikeComponent component)
-    {
-        // This would require a corresponding method in ComponentRepository
-        // e.g., await componentRepository.Update(component);
-        await Task.CompletedTask;
-    }
-
-    public async Task<bool> DeleteComponent(Guid id)
-    {
-        // This would require a corresponding method in ComponentRepository
-        // e.g., return await componentRepository.Delete(id);
-        return await Task.FromResult(true);
-    }
-
-    public void LogRideForBikeComponents(Guid bikeId, double distance)
-    {
-        componentRepository.GetBikeComponents(bikeId)
-            .ToList()
-            .ForEach(async component =>
-            {
-                await componentRepository.IncreaseDistance(component.Id, distance, bikeId);
-            });
+        var tasks = componentRepository.GetBikeComponents(bikeId)
+            .Select(component => IncreaseComponentDistance(component.Id, distance, bikeId));
+        await Task.WhenAll(tasks);
     }
 }
