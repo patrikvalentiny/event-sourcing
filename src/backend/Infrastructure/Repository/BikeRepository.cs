@@ -17,8 +17,6 @@ public class BikeRepository(MartenContext martenContext)
     }
 
 
-
-    
     public async Task<Bike?> Get(Guid id)
     {
         using var session = martenContext.GetQuerySession();
@@ -26,7 +24,7 @@ public class BikeRepository(MartenContext martenContext)
         return bikeStream;
     }
 
-       public async Task<Bike?> GetBySerialNumber(string serialNumber)
+    public async Task<Bike?> GetBySerialNumber(string serialNumber)
     {
         using var session = martenContext.GetQuerySession();
         var bike = await session.Query<Bike>().FirstOrDefaultAsync(b => b.SerialNumber == serialNumber);
@@ -53,6 +51,14 @@ public class BikeRepository(MartenContext martenContext)
         using var session = martenContext.GetLightweightSession();
         session.Events.Append(bikeDeleted.Id, bikeDeleted);
         session.Events.ArchiveStream(bikeDeleted.Id);
+        await session.SaveChangesAsync();
+        return true;
+    }
+    
+    public async Task<bool> AddRideToBike(Guid bikeId, double distance, DateTime rideDate)
+    {
+        using var session = martenContext.GetLightweightSession();
+        session.Events.Append(bikeId, new RideLogged(bikeId, distance, rideDate, DateTime.UtcNow));
         await session.SaveChangesAsync();
         return true;
     }

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_2Rwe7TTMY4
 createdAt: 2025-05-19T07:51:07.786050700
-updatedAt: 2025-05-19T13:35:52.737622500
+updatedAt: 2025-05-20T06:13:25.159079600
 workspaceId: wk_6mRMT4yPtm
 folderId: fl_iE8G92PhrS
 authentication: {}
@@ -25,6 +25,6 @@ headers:
   id: null
 method: POST
 name: Create Bike
-sortPriority: 3000.0
+sortPriority: 2000.0
 url: http://localhost:5074/api/bikes
 urlParameters: []

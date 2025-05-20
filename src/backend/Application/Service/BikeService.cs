@@ -8,6 +8,7 @@ namespace backend.Application.Service;
 
 public class BikeService(BikeRepository bikeRepository)
 {
+
     public async Task<IEnumerable<Bike>> GetAllBikes()
     {
         return await bikeRepository.GetAll();
@@ -40,7 +41,7 @@ public class BikeService(BikeRepository bikeRepository)
             bike.Model,
             bike.SerialNumber,
             bike.Year,
-            bike.BikeType            
+            bike.BikeType
         );
         await bikeRepository.Update(bikeUpdated);
     }
@@ -49,5 +50,17 @@ public class BikeService(BikeRepository bikeRepository)
     {
         var bikeDeleted = new BikeDeleted(id);
         return await bikeRepository.Delete(bikeDeleted);
+    }
+    
+    public async Task<bool> AddRideToBike(Guid bikeId, double distance, DateTime rideDate)
+    {
+        var bike = await bikeRepository.Get(bikeId);
+        if (bike == null)
+        {
+            return false;
+        }
+
+        await bikeRepository.AddRideToBike(bikeId, distance, rideDate);
+        return true;
     }
 }

@@ -12,6 +12,7 @@ public class Bike
     public int Year { get; set; }
     public BikeType BikeType { get; set; }
     public bool IsDeleted { get; set; } = false;
+    public double TotalDistance { get; set; } = 0;
 }
 
 public enum BikeType

@@ -1,0 +1,30 @@
+type: http_request
+model: http_request
+id: rq_6M6WiVKHpg
+createdAt: 2025-05-20T06:18:06.129474100
+updatedAt: 2025-05-20T06:20:20.727488800
+workspaceId: wk_6mRMT4yPtm
+folderId: fl_9LbhJV9eMP
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "bikeId": "19405376-0657-45cb-85b6-e8f394bbe277",
+      "componentType": "Chain",
+      "brand": "Shimano",
+      "model": "105",
+      "purchaseDate": ${[ faker.date.past() ]}
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: null
+method: POST
+name: ''
+sortPriority: 0.0
+url: http://localhost:5074/api/components/19405376-0657-45cb-85b6-e8f394bbe277
+urlParameters: []

@@ -44,6 +44,7 @@ builder.Services.AddMarten(options =>
     options.Events.UseMandatoryStreamTypeDeclaration = true;
 
     options.Projections.Add<BikeAggregation>(ProjectionLifecycle.Inline);
+    options.Projections.Add<ComponentAggregation>(ProjectionLifecycle.Inline);
 
     // If we're running in development mode, let Marten just take care
     // of all necessary schema building and patching behind the scenes
@@ -56,6 +57,9 @@ builder.Services.AddMarten(options =>
 builder.Services.AddSingleton<MartenContext>();
 builder.Services.AddScoped<BikeRepository>();
 builder.Services.AddScoped<BikeService>();
+builder.Services.AddScoped<ComponentRepository>();
+builder.Services.AddScoped<ComponentService>();
+builder.Services.AddScoped<RideService>();
 
 var app = builder.Build();
 

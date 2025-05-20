@@ -42,9 +42,14 @@ public class BikeAggregation : SingleStreamProjection<Bike>
         bike.Year = @event.Year;
         bike.BikeType = @event.BikeType;
     }
-    
+
     public void Apply(BikeDeleted @event, Bike bike)
     {
         bike.IsDeleted = true;
+    }
+    
+    public void Apply(RideLogged @event, Bike bike)
+    {
+        bike.TotalDistance += @event.Distance;
     }
 }
