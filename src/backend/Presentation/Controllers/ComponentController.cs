@@ -1,65 +1,48 @@
 using Microsoft.AspNetCore.Mvc;
 using backend.Application.Service;
 using backend.Domain.Entities;
+using backend.Domain.Commands;
+using Wolverine;
 
 namespace backend.Presentation.Controllers;
 
 [Route("api/components/{bikeId}")]
 [ApiController]
-public class ComponentController(ComponentService componentService) : Controller
+public class ComponentController(IMessageBus bus) : Controller
 {
-    [HttpGet]
-    public async Task<IActionResult> GetComponents(Guid bikeId)
-    {
-        var components = await componentService.GetAllComponents(bikeId);
-        return Ok(components);
-    }
+
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetComponent(Guid id)
     {
-        var component = await componentService.GetComponent(id);
-        if (component == null)
-            return NotFound();
-        return Ok(component);
+        return NotFound();
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddComponent(Guid bikeId, [FromBody] BikeComponent component)
+    public async Task<IActionResult> AddComponent(Guid bikeId, [FromBody] AddComponentCommand component)
     {
-        component.BikeId = bikeId;
-        // Ensure AddedAt is set if not handled by domain or repository
-        if (component.AddedAt == default)
-        {
-            component.AddedAt = DateTime.UtcNow;
-        }
-        await componentService.AddComponent(component);
+        if( component.BikeId != bikeId)
+            return BadRequest("Bike ID in the URL does not match the Bike ID in the request body.");
+        if (component == null)
+            return BadRequest("Component cannot be null");
+        
+        await bus.InvokeAsync(component);
         return Ok();
     }
 
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateComponent(Guid id, [FromBody] BikeComponent component)
+    [HttpPut("{oldComponentId}")]
+    public async Task<IActionResult> ReplaceComponent(Guid bikeId, Guid oldComponentId, [FromBody] ReplaceComponentCommand command)
     {
-        if (id != component.Id)
-            return BadRequest();
-        await componentService.UpdateComponent(component);
-        return NoContent();
-    }
+        if (command.BikeId != bikeId)
+            return BadRequest("Bike ID in the URL does not match the Bike ID in the request body.");
+        
+        if (command.OldComponentId != oldComponentId)
+            return BadRequest("Old Component ID in the URL does not match the Old Component ID in the request body.");
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteComponent(Guid id)
-    {
-        var deleted = await componentService.DeleteComponent(id);
-        if (!deleted)
-            return NotFound();
-        return NoContent();
-    }
-}
+        if (command == null)
+            return BadRequest("Command cannot be null");
 
-// Helper class for the request body of IncreaseDistance
-public class IncreaseDistanceRequest
-{
-    public int Mileage { get; set; }
-    public Guid RideId { get; set; }
+        var newId=  await bus.InvokeAsync<Guid>(command);
+        return Ok(newId);
+    }
 }

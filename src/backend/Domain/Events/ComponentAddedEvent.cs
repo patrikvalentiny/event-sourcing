@@ -1,7 +1,7 @@
 namespace backend.Domain.Events;
 
-public record ComponentAdded(
-    Guid Id,
+public record ComponentAddedEvent(
+    Guid ComponentId,
     Guid BikeId,
     string ComponentType, // "Chain", "Tires"
     string Brand,

@@ -10,6 +10,7 @@ using Marten.Events.Schema;
 using Scalar.AspNetCore;
 using Serilog;
 using Weasel.Core;
+using Wolverine;
 
 using var log = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -29,6 +30,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 
+
+
+
 builder.Services.AddMarten(options =>
 {
     // Establish the connection string to your Marten database
@@ -44,7 +48,6 @@ builder.Services.AddMarten(options =>
     options.Events.UseMandatoryStreamTypeDeclaration = true;
 
     options.Projections.Add<BikeAggregation>(ProjectionLifecycle.Inline);
-    options.Projections.Add<ComponentAggregation>(ProjectionLifecycle.Inline);
 
     // If we're running in development mode, let Marten just take care
     // of all necessary schema building and patching behind the scenes
@@ -57,9 +60,13 @@ builder.Services.AddMarten(options =>
 builder.Services.AddSingleton<MartenContext>();
 builder.Services.AddScoped<BikeRepository>();
 builder.Services.AddScoped<BikeService>();
-builder.Services.AddScoped<ComponentRepository>();
-builder.Services.AddScoped<ComponentService>();
-builder.Services.AddScoped<RideService>();
+builder.Services.AddScoped<RideRepository>();
+
+builder.Host.UseWolverine(options =>
+{
+    options.Durability.Mode = DurabilityMode.MediatorOnly;
+});
+
 
 var app = builder.Build();
 

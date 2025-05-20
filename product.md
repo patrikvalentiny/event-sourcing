@@ -1,137 +1,116 @@
 # Bike Wear Tracker
 
-This product focuses on tracking the component wear of your bicycles to prolong the life and easy maintenance
+This product helps you track the wear and maintenance of your bicycle components for better longevity and easier upkeep.
 
 ---
+
 ## Implementation Plan
-Using [Marten](https://martendb.io/introduction.html) for Postgres as Document storage and Event Sourcing Events
+
+Using [Marten](https://martendb.io/introduction.html) for PostgreSQL as the event store and document storage, following event sourcing, CQRS, and Clean Architecture patterns.
 
 ### Entities
 
 #### Bike
+
 ```json
 {
-    "id": "guid",
-    "brand": "string",
-    "model": "string",
-    "year": "number",
-    "bikeType": {
-        "enum": [
-            "road",
-            "mountain",
-            "gravel",
-            "city",
-            "ebike",
-            "hybrid"
-        ]
-    }
+  "id": "guid",
+  "brand": "string",
+  "model": "string",
+  "serialNumber": "string",
+  "year": "number",
+  "bikeType": "string", // "road", "mountain", "gravel", "city", "ebike", "hybrid"
+  "mileage":"number",
+  "components": [
+        {
+            "id": "guid",
+            "bikeId": "guid",
+            "componentType": "string",
+            "brand": "string",
+            "model": "string",
+            "purchaseDate": "date",
+            "position": "string",
+            "mileage": "number"
+        }
+    ]
 }
 ```
 
-#### Chain
+#### Component
+
 ```json
 {
-    "id": "guid",
-    "bikeId": "guid",
-    "brand": "string",
-    "model": "string",
-    "purchaseDate": "date",
-    "distance": "number"
+  "id": "guid",
+  "bikeId": "guid",
+  "componentType": "string", // "Chain", "Tires", etc.
+  "brand": "string",
+  "model": "string",
+  "purchaseDate": "date",
+  "position": "string", // Optional: "front", "rear" for tires
+  "mileage": "number"
 }
 ```
 
-#### Tires
-```json
-{
-    "id": "guid",
-    "bikeId": "guid",
-    "brand": "string",
-    "model": "string",
-    "purchaseDate": "date",
-    "distance": "number",
-    "position": {
-        "enum": [
-            "front",
-            "rear"
-        ]
-    }
-}
-```
-### Events
+---
 
-#### BikeRegistered
+## Commands
+
+Commands represent user intentions and actions in the system.
+
+### RegisterBike
+
 ```json
 {
-    "eventId": "guid",
-    "bikeId": "guid",
-    "brand": "string",
-    "model": "string",
-    "year": "number",
-    "bikeType": "string", // "road", "mountain", etc.
-    "registeredAt": "timestamp"
+  "commandType": "RegisterBike",
+  "bikeId": "guid",
+  "brand": "string",
+  "model": "string",
+  "serialNumber": "string",
+  "year": "number",
+  "bikeType": "string"
 }
 ```
 
-#### ComponentAdded
+### AddComponent
+
 ```json
 {
-    "eventId": "guid",
-    "bikeId": "guid",
-    "componentId": "guid",
-    "componentType": "string", // "Chain", "Tires"
-    "brand": "string",
-    "model": "string",
-    "purchaseDate": "date",
-    "position": "string", // Optional: "front", "rear" for tires
-    "addedAt": "timestamp"
+  "commandType": "AddComponent",
+  "componentId": "guid",
+  "bikeId": "guid",
+  "componentType": "string",
+  "brand": "string",
+  "model": "string",
+  "purchaseDate": "date",
+  "position": "string" // Optional
 }
 ```
 
-#### RideLogged
+### LogRide
+
 ```json
 {
-    "eventId": "guid",
-    "bikeId": "guid",
-    "distance": "number",
-    "rideDate": "date",
-    "loggedAt": "timestamp"
+  "commandType": "LogRide",
+  "rideId": "guid",
+  "bikeId": "guid",
+  "distance": "number",
+  "rideDate": "date"
 }
 ```
 
-#### ComponentDistanceIncreased
-```json
-{
-    "eventId": "guid",
-    "componentId": "guid",
-    "distanceAdded": "number",
-    "rideId": "guid", // Reference to RideLogged event
-    "updatedAt": "timestamp"
-}
-```
+### ReplaceComponent
 
-#### MaintenanceLogged
 ```json
 {
-    "eventId": "guid",
-    "bikeId": "guid",
-    "componentId": "guid", // Optional
-    "activityType": "string", // e.g., "Cleaned", "Replaced", "Adjusted"
-    "description": "string",
-    "datePerformed": "date",
-    "notes": "string", // Optional
-    "loggedAt": "timestamp"
-}
-```
-
-#### ComponentReplaced
-```json
-{
-    "eventId": "guid",
-    "bikeId": "guid",
-    "oldComponentId": "guid",
-    "newComponentId": "guid",
-    "componentType": "string", // "Chain", "Tires"
-    "replacementDate": "timestamp"
+  "commandType": "ReplaceComponent",
+  "oldComponentId": "guid",
+  "newComponentId": "guid",
+  "bikeId": "guid",
+  "componentType": "string",
+  "brand": "string",
+  "model": "string",
+  "purchaseDate": "date",
+  "position": "string" // Optional
 }
 ```
 
@@ -139,114 +118,89 @@ Using [Marten](https://martendb.io/introduction.html) for Postgres as Document s
 
 ## Example Use Case: Tracking Chain Wear and Replacement
 
-This example demonstrates how the system uses event sourcing to track a bike's chain usage and replacement.
+This example demonstrates how the system uses commands to track a bike's chain usage and replacement.
 
 ### Scenario
 
-1. **Register a new bike**
-2. **Add a new chain to the bike**
-3. **Log several rides**
-4. **Increase the chain's distance after each ride**
-5. **Replace the chain after it wears out**
+1. Register a new bike
+2. Add a new chain to the bike
+3. Log several rides
+4. Increase the chain's distance after each ride
+5. Replace the chain after it wears out
 
-### Event Stream
+### Command Stream
 
 ```json
 [
-    // 1. Register bike
-    {
-        "eventType": "BikeRegistered",
-        "eventId": "1",
-        "bikeId": "bike-123",
-        "brand": "Trek",
-        "model": "Domane",
-        "year": 2022,
-        "bikeType": "road",
-        "registeredAt": "2024-06-01T10:00:00Z"
-    },
-    // 2. Add chain (Shimano Ultegra)
-    {
-        "eventType": "ComponentAdded",
-        "eventId": "2",
-        "bikeId": "bike-123",
-        "componentId": "chain-abc",
-        "componentType": "Chain",
-        "brand": "Shimano",
-        "model": "Ultegra",
-        "purchaseDate": "2024-06-01",
-        "addedAt": "2024-06-01T10:05:00Z"
-    },
-    // Chain distance: 0
-    // 3. Log ride #1 (50km)
-    {
-        "eventType": "RideLogged",
-        "eventId": "3",
-        "bikeId": "bike-123",
-        "distance": 50,
-        "rideDate": "2024-06-02",
-        "loggedAt": "2024-06-02T18:00:00Z"
-    },
-    // 4. Increase chain distance by 50km (after ride #1)
-    {
-        "eventType": "ComponentDistanceIncreased",
-        "eventId": "4",
-        "componentId": "chain-abc",
-        "distanceAdded": 50,
-        "rideId": "3",
-        "updatedAt": "2024-06-02T18:01:00Z"
-    },
-    // Chain distance: 50
-    // 5. Log ride #2 (60km)
-    {
-        "eventType": "RideLogged",
-        "eventId": "5",
-        "bikeId": "bike-123",
-        "distance": 60,
-        "rideDate": "2024-06-05",
-        "loggedAt": "2024-06-05T19:00:00Z"
-    },
-    // 6. Increase chain distance by 60km (after ride #2)
-    {
-        "eventType": "ComponentDistanceIncreased",
-        "eventId": "6",
-        "componentId": "chain-abc",
-        "distanceAdded": 60,
-        "rideId": "5",
-        "updatedAt": "2024-06-05T19:01:00Z"
-    },
-    // Chain distance: 110
-    // 7. Replace chain (Shimano Ultegra -> SRAM Force)
-    {
-        "eventType": "ComponentReplaced",
-        "eventId": "7",
-        "bikeId": "bike-123",
-        "oldComponentId": "chain-abc",
-        "newComponentId": "chain-def",
-        "componentType": "Chain",
-        "replacementDate": "2024-07-01T10:00:00Z"
-    },
-    // Chain-abc is retired at 110km, chain-def starts at 0
-    // 8. Add new chain (SRAM Force)
-    {
-        "eventType": "ComponentAdded",
-        "eventId": "8",
-        "bikeId": "bike-123",
-        "componentId": "chain-def",
-        "componentType": "Chain",
-        "brand": "SRAM",
-        "model": "Force",
-        "purchaseDate": "2024-07-01",
-        "addedAt": "2024-07-01T10:00:01Z"
-    }
-    // Chain-def distance: 0
+  {
+    "commandType": "RegisterBike",
+    "bikeId": "bike-123",
+    "brand": "Trek",
+    "model": "Domane",
+    "serialNumber": "SN-001",
+    "year": 2022,
+    "bikeType": "road"
+  },
+  {
+    "commandType": "AddComponent",
+    "componentId": "chain-abc",
+    "bikeId": "bike-123",
+    "componentType": "Chain",
+    "brand": "Shimano",
+    "model": "Ultegra",
+    "purchaseDate": "2024-06-01",
+    "position": null
+  },
+  {
+    "commandType": "LogRide",
+    "rideId": "ride-1",
+    "bikeId": "bike-123",
+    "distance": 50,
+    "rideDate": "2024-06-02"
+  },
+  {
+    "commandType": "IncreaseComponentDistance",
+    "componentId": "chain-abc",
+    "distanceAdded": 50,
+    "rideId": "ride-1"
+  },
+  {
+    "commandType": "LogRide",
+    "rideId": "ride-2",
+    "bikeId": "bike-123",
+    "distance": 60,
+    "rideDate": "2024-06-05"
+  },
+  {
+    "commandType": "IncreaseComponentDistance",
+    "componentId": "chain-abc",
+    "distanceAdded": 60,
+    "rideId": "ride-2"
+  },
+  {
+    "commandType": "ReplaceComponent",
+    "oldComponentId": "chain-abc",
+    "newComponentId": "chain-def",
+    "bikeId": "bike-123",
+    "componentType": "Chain",
+    "replacementDate": "2024-07-01"
+  },
+  {
+    "commandType": "AddComponent",
+    "componentId": "chain-def",
+    "bikeId": "bike-123",
+    "componentType": "Chain",
+    "brand": "SRAM",
+    "model": "Force",
+    "purchaseDate": "2024-07-01",
+    "position": null
+  }
 ]
 ```
 
 ### Explanation
 
-- Each event records a fact that happened, not the resulting state.
-- State (e.g., total chain distance, which chain is on the bike) is reconstructed by replaying events in order.
-- No derived data (like `newTotalDistance` or `distanceAtReplacement`) is stored in events; these are calculated by projecting the event stream.
-- This approach provides a full audit trail and enables easy debugging, analytics, and state reconstruction at any point in time.
-
-
+- Each command represents an intention or action from the user.
+- The system processes commands to produce events and update state.
+- State (e.g., total chain distance, which chain is on the bike) is reconstructed by applying events resulting from commands.
+- This approach provides a clear audit trail and enables easy debugging, analytics, and state reconstruction at any point in time.

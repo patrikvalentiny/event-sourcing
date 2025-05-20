@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_yaB6K4Ln2k
 createdAt: 2025-05-20T06:13:20.795823
-updatedAt: 2025-05-20T06:16:59.950592400
+updatedAt: 2025-05-20T13:38:27.797836600
 workspaceId: wk_6mRMT4yPtm
 folderId: fl_3HaPVuuRvt
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "bikeId": "19405376-0657-45cb-85b6-e8f394bbe277",
+      "bikeId": "a4e092cf-0a71-48dd-a915-d013ec615373",
       "distance": 30,
       "rideDate": ${[ faker.date.past() ]}
     }

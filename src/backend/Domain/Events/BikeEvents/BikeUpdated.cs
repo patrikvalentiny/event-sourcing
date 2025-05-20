@@ -8,5 +8,5 @@ public record class BikeUpdated(
     string Model,
     string SerialNumber,
     int Year,
-    BikeType BikeType
+    string BikeType
 );

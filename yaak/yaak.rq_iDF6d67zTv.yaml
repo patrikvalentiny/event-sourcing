@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_iDF6d67zTv
 createdAt: 2025-05-19T07:58:29.607260600
-updatedAt: 2025-05-20T06:13:25.159004300
+updatedAt: 2025-05-20T13:26:41.897881700
 workspaceId: wk_6mRMT4yPtm
 folderId: fl_iE8G92PhrS
 authentication: {}
@@ -14,5 +14,5 @@ headers: []
 method: GET
 name: Get Bike
 sortPriority: 1000.0
-url: http://localhost:5074/api/bikes/19405376-0657-45cb-85b6-e8f394bbe277
+url: http://localhost:5074/api/bikes/a4e092cf-0a71-48dd-a915-d013ec615373
 urlParameters: []

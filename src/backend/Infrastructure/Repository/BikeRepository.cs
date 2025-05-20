@@ -31,11 +31,12 @@ public class BikeRepository(MartenContext martenContext)
         return bike;
     }
 
-    public async Task Add(BikeRegistered bike)
+    public async Task<Guid> Add(BikeRegisteredEvent bike)
     {
         using var session = martenContext.GetLightweightSession();
-        session.Events.StartStream<Bike>(bike.Id, bike);
+        var streamId = session.Events.StartStream<Bike>(bike.Id, bike).Id;
         await session.SaveChangesAsync();
+        return streamId;
     }
 
 
@@ -54,13 +55,6 @@ public class BikeRepository(MartenContext martenContext)
         await session.SaveChangesAsync();
         return true;
     }
-    
-    public async Task<bool> AddRideToBike(Guid bikeId, double distance, DateTime rideDate)
-    {
-        using var session = martenContext.GetLightweightSession();
-        session.Events.Append(bikeId, new RideLogged(bikeId, distance, rideDate, DateTime.UtcNow));
-        await session.SaveChangesAsync();
-        return true;
-    }
+
 
 }

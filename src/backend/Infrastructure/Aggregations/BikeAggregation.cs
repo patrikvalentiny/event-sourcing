@@ -12,7 +12,7 @@ public class BikeAggregation : SingleStreamProjection<Bike>
     {
     }
 
-    public Bike Create(BikeRegistered @event)
+    public Bike Create(BikeRegisteredEvent @event)
     {
         return new Bike
         {
@@ -24,7 +24,7 @@ public class BikeAggregation : SingleStreamProjection<Bike>
             BikeType = @event.BikeType
         };
     }
-    public void Apply(BikeRegistered @event, Bike bike)
+    public void Apply(BikeRegisteredEvent @event, Bike bike)
     {
         bike.Id = @event.Id;
         bike.Brand = @event.Brand;
@@ -47,9 +47,55 @@ public class BikeAggregation : SingleStreamProjection<Bike>
     {
         bike.IsDeleted = true;
     }
-    
-    public void Apply(RideLogged @event, Bike bike)
+
+    public void Apply(RideLoggedEvent @event, Bike bike)
     {
         bike.TotalDistance += @event.Distance;
+        bike.Components.ForEach(c =>
+        {
+
+            c.Mileage += @event.Distance;
+
+        });
+    }
+
+    public void Apply(ComponentAddedEvent @event, Bike bike)
+    {
+        var component = new BikeComponent
+        {
+            ComponentId = @event.ComponentId,
+            BikeId = bike.Id,
+            ComponentType = @event.ComponentType,
+            Brand = @event.Brand,
+            Model = @event.Model,
+            PurchaseDate = @event.PurchaseDate,
+            Position = @event.Position,
+            AddedAt = DateTime.UtcNow, // Consider using event timestamp if available
+            Mileage = 0
+        };
+        bike.Components.Add(component);
+    }
+
+    public void Apply(ComponentReplacedEvent @event, Bike bike)
+    {
+        var oldComponent = bike.Components.FirstOrDefault(c => c.ComponentId == @event.OldComponentId);
+        if (oldComponent != null)
+        {
+            bike.Components.Remove(oldComponent);
+        }
+
+        var newComponent = new BikeComponent
+        {
+            ComponentId = @event.NewComponentId,
+            BikeId = bike.Id,
+            ComponentType = @event.ComponentType,
+            Brand = @event.Brand,
+            Model = @event.Model,
+            PurchaseDate = @event.PurchaseDate,
+            Position = @event.Position,
+            AddedAt = DateTime.UtcNow,
+            Mileage = 0
+        };
+        bike.Components.Add(newComponent);
     }
 }
