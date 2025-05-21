@@ -2,75 +2,42 @@ using Microsoft.AspNetCore.Mvc;
 using backend.Application.Service;
 using backend.Domain.Commands;
 using Wolverine;
+using backend.Domain.Entities;
+using backend.Application.Queries;
 
 namespace backend.Presentation.Controllers;
 
 [Route("api/bikes")]
 [ApiController]
-public class BikeController(BikeService bikeService, IMessageBus bus) : Controller
+public class BikeController( IMessageBus bus) : Controller
 {
-    [HttpGet]
-    public async Task<IActionResult> GetBikes()
-    {
-        var bikes = await bikeService.GetAllBikes();
-        return Ok(bikes);
-    }
+    // [HttpGet]
+    // public async Task<IActionResult> GetBikes()
+    // {
+    //     // var bikes = await bikeService.GetAllBikes();
+    //     // return Ok(bikes);
+    //     return Ok()
+    // }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetBike(Guid id)
+    [HttpGet]
+    public async Task<IActionResult> GetBike([FromBody] GetBikeQuery query)
     {
-        var bike = await bikeService.GetBike(id);
+        var bike = await bus.InvokeAsync<Bike?>(query);
         if (bike == null)
             return NotFound();
         return Ok(bike);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetBike(Guid id)
+    {
+        var query = new GetBikeQuery { BikeId = id };
+        return await GetBike(query);
+    }
     [HttpPost]
     public async Task<IActionResult> AddBike([FromBody] RegisterBikeCommand bikeCommand)
     {
         var streamId = await bus.InvokeAsync<Guid>(bikeCommand);
         return CreatedAtAction(nameof(GetBike), new { id = streamId }, bikeCommand);
     }
-
-    // [HttpPost]
-    // public async Task<IActionResult> AddBike([FromBody] CreateBikeDto bikeDto)
-    // {
-    //     await bikeService.RegisterBike(
-    //         bikeDto.Brand,
-    //         bikeDto.Model,
-    //         bikeDto.SerialNumber,
-    //         bikeDto.Year,
-    //         bikeDto.BikeType
-    //     );
-    //     return Ok();
-    // }
-
-    // [HttpPut("{id}")]
-    // public async Task<IActionResult> UpdateBike(Guid id, [FromBody] UpdateBikeDto updateBike)
-    // {
-    //     if (id != updateBike.Id)
-    //         return BadRequest();
-            
-    //     var bike = new Bike()
-    //     {
-    //         Id = updateBike.Id,
-    //         Brand = updateBike.Brand,
-    //         Model = updateBike.Model,
-    //         SerialNumber = updateBike.SerialNumber,
-    //         Year = updateBike.Year,
-    //         BikeType = Enum.Parse<BikeType>(updateBike.BikeType)
-    //     };
-
-    //     await bikeService.UpdateBike(bike);
-    //     return NoContent();
-    // }
-
-    // [HttpDelete("{id}")]
-    // public async Task<IActionResult> DeleteBike(Guid id)
-    // {
-    //     var deleted = await bikeService.DeleteBike(id);
-    //     if (!deleted)
-    //         return NotFound();
-    //     return NoContent();
-    // }
 }

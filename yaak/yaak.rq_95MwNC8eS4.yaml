@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_95MwNC8eS4
 createdAt: 2025-05-20T13:56:13.037337800
-updatedAt: 2025-05-20T13:59:58.424392600
+updatedAt: 2025-05-21T13:27:27.038082200
 workspaceId: wk_6mRMT4yPtm
 folderId: fl_9LbhJV9eMP
 authentication: {}
@@ -26,7 +26,7 @@ headers:
   value: application/json
   id: null
 method: PUT
-name: ''
+name: Replace Component
 sortPriority: 0.0
 url: http://localhost:5074/api/components/a4e092cf-0a71-48dd-a915-d013ec615373/8a60ad37-27cb-46f1-9443-758ddb977200
 urlParameters: []

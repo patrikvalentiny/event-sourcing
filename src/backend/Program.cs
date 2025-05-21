@@ -59,7 +59,6 @@ builder.Services.AddMarten(options =>
 
 builder.Services.AddSingleton<MartenContext>();
 builder.Services.AddScoped<BikeRepository>();
-builder.Services.AddScoped<BikeService>();
 builder.Services.AddScoped<RideRepository>();
 
 builder.Host.UseWolverine(options =>

@@ -1,21 +1,11 @@
 using backend.Domain.Entities;
 using backend.Domain.Events;
-using backend.Domain.Events.BikeEvents;
 using backend.Infrastructure.Context;
-using Marten;
-using Marten.Events;
 
 namespace backend.Infrastructure.Repository;
 
 public class BikeRepository(MartenContext martenContext)
 {
-    public async Task<IEnumerable<Bike>> GetAll()
-    {
-        using var session = martenContext.GetQuerySession();
-        var bikes = await session.Query<Bike>().ToListAsync();
-        return bikes;
-    }
-
 
     public async Task<Bike?> Get(Guid id)
     {
@@ -24,36 +14,12 @@ public class BikeRepository(MartenContext martenContext)
         return bikeStream;
     }
 
-    public async Task<Bike?> GetBySerialNumber(string serialNumber)
-    {
-        using var session = martenContext.GetQuerySession();
-        var bike = await session.Query<Bike>().FirstOrDefaultAsync(b => b.SerialNumber == serialNumber);
-        return bike;
-    }
-
     public async Task<Guid> Add(BikeRegisteredEvent bike)
     {
         using var session = martenContext.GetLightweightSession();
         var streamId = session.Events.StartStream<Bike>(bike.Id, bike).Id;
         await session.SaveChangesAsync();
         return streamId;
-    }
-
-
-    public async Task Update(BikeUpdated bikeUpdated)
-    {
-        using var session = martenContext.GetLightweightSession();
-        session.Events.Append(bikeUpdated.Id, bikeUpdated);
-        await session.SaveChangesAsync();
-    }
-
-    public async Task<bool> Delete(BikeDeleted bikeDeleted)
-    {
-        using var session = martenContext.GetLightweightSession();
-        session.Events.Append(bikeDeleted.Id, bikeDeleted);
-        session.Events.ArchiveStream(bikeDeleted.Id);
-        await session.SaveChangesAsync();
-        return true;
     }
 
 

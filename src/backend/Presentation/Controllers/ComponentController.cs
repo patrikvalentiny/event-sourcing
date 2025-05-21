@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using backend.Application.Service;
-using backend.Domain.Entities;
 using backend.Domain.Commands;
 using Wolverine;
 

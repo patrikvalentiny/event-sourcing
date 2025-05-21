@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_6M6WiVKHpg
 createdAt: 2025-05-20T06:18:06.129474100
-updatedAt: 2025-05-20T13:48:13.463372900
+updatedAt: 2025-05-21T13:27:41.588640700
 workspaceId: wk_6mRMT4yPtm
 folderId: fl_9LbhJV9eMP
 authentication: {}
@@ -11,10 +11,11 @@ body:
   text: |-
     {
       "bikeId": "a4e092cf-0a71-48dd-a915-d013ec615373",
-      "componentType": "Chain",
+      "componentType": "Tyre",
       "brand": "Shimano",
       "model": "105",
-      "purchaseDate": ${[ faker.date.past() ]}
+      "purchaseDate": ${[ faker.date.past() ]},
+      "position":"rear"
     }
 bodyType: application/json
 description: ''
@@ -24,7 +25,7 @@ headers:
   value: application/json
   id: null
 method: POST
-name: ''
-sortPriority: 0.0
+name: New Component
+sortPriority: 2000.0
 url: http://localhost:5074/api/components/a4e092cf-0a71-48dd-a915-d013ec615373
 urlParameters: []

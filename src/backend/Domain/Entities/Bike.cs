@@ -10,7 +10,6 @@ public class Bike
     public string SerialNumber { get; set; } = default!;
     public int Year { get; set; }
     public string BikeType { get; set; } = default!;
-    public bool IsDeleted { get; set; } = false;
     public double TotalDistance { get; set; } = 0;
     public List<BikeComponent> Components { get; set; } = [];
 }
