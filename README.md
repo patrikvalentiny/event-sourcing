@@ -107,6 +107,14 @@ This project demonstrates the effectiveness of event sourcing, CQRS, and Clean A
 
 ---
 
+## References
+
+- [Building a Critter Stack Application](https://jeremydmiller.com/2023/11/28/building-a-critter-stack-application-event-storming/)
+- [Marten Documentation](https://martendb.io/)
+- [Wolverine Documentation](https://wolverine.netlify.app/)
+- [EventSourcing.NetCore (Sample Project)](https://github.com/oskardudycz/EventSourcing.NetCore)
+- [Kurrent: A Beginner’s Guide to Event Sourcing](https://www.kurrent.io/event-sourcing)
+
 ## Appendix
 
 ### A. Implementation Plan & Event Stream Concept
