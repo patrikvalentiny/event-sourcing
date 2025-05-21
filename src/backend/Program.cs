@@ -36,7 +36,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddMarten(options =>
 {
     // Establish the connection string to your Marten database
-    options.Connection(builder.Configuration.GetConnectionString("MartenConnectionString") ?? "Host=localhost;Database=postgres;Username=postgres;Password=postgres");
+    var connectionString = builder.Configuration["MartenConnectionString"];
+    options.Connection(connectionString ?? "Host=localhost;Database=postgres;Username=postgres;Password=postgres");
 
     // Specify that we want to use STJ as our serializer
     options.UseSystemTextJsonForSerialization();
@@ -53,6 +54,7 @@ builder.Services.AddMarten(options =>
     // of all necessary schema building and patching behind the scenes
     if (builder.Environment.IsDevelopment())
     {
+        Log.Information("Using connection string: {ConnectionString}", connectionString);
         options.AutoCreateSchemaObjects = AutoCreate.All;
     }
 });
