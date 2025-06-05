@@ -1,4 +1,4 @@
-# Event Sourcing for Bike Wear Tracking: A Synopsis
+# Event Sourcing for Bike Wear Tracking
 
 ## 1. Introduction & Motivation
 
@@ -116,6 +116,12 @@ This project demonstrates the effectiveness of event sourcing, CQRS, and Clean A
 - [Kurrent: A Beginner’s Guide to Event Sourcing](https://www.kurrent.io/event-sourcing)
 
 ## Appendix
+
+### System Architecture Diagram
+
+![Bike Wear Tracker System Architecture](System-Diagram.png)
+
+*Figure: High-level architecture showing Clean Architecture layers, CQRS, event sourcing with Marten, Wolverine for mediation, PostgreSQL for persistence, and REST API exposure.*
 
 ### A. Implementation Plan & Event Stream Concept
 
