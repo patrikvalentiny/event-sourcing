@@ -6,13 +6,12 @@ paginate: true
 
 # Bike Wear Tracker  
 
-Event Sourcing, CQRS & Clean Architecture
+Event Sourcing and CQRS in .NET
 
 ---
 
 ## Introduction & Motivation
 
-- Modern systems need **reliability**, **auditability**, **evolvability**
 - **Event Sourcing**: records all state changes as immutable events
 - **Bike Wear Tracker**: helps cyclists monitor wear and maintenance
 
@@ -24,16 +23,12 @@ Event Sourcing, CQRS & Clean Architecture
   - **Auditability**: Hard to reconstruct history
   - **Evolvability**: Schema changes are risky
   - **Reliability**: Data loss/corruption is hard to detect
-- Cyclists need to track:
-  - Component usage (chain, tires, etc.)
-  - Maintenance and replacements
-  - Ride logs and mileage
 
 ---
 
 ## Solution Overview
 
-- **Event Sourcing**: Every change is an event
+- **Event Sourcing**: Every change is an immutable event
 - **CQRS**: Separate write (commands) and read (queries) models
 - **Clean Architecture**: Clear separation of concerns
 - **Tech Stack**:
@@ -81,6 +76,66 @@ Event Sourcing, CQRS & Clean Architecture
 
 ---
 
+## Event Sourcing with Marten
+
+```csharp
+// Start a new event stream for a bike
+var streamId = session.Events.StartStream<Bike>(bikeId, new BikeRegisteredEvent(...)).Id;
+await session.SaveChangesAsync();
+
+// Append a new event (e.g., RideLoggedEvent)
+session.Events.Append(bikeId, new RideLoggedEvent(...));
+await session.SaveChangesAsync();
+```
+
+*Events are stored in PostgreSQL and can be replayed to reconstruct state.*
+
+---
+
+## CQRS with Wolverine
+
+```csharp
+await bus.InvokeAsync<Guid?>(command);
+
+// Command handler example
+public class RegisterBikeHandler(BikeRepository repo)
+{
+    public async Task<Guid> Handle(RegisterBikeCommand command)
+    {
+        var evt = new BikeRegisteredEvent(...);
+        return await repo.Add(evt);
+    }
+}
+```
+
+*Wolverine registers and dispatches commands and queries to handlers, decoupling write and read logic.*
+
+---
+
+## Aggregation & Projections
+
+```csharp
+public async Task<Bike?> Get(Guid id)
+{
+    using var session = martenContext.GetQuerySession();
+    var bikeStream = await session.Events.AggregateStreamAsync<Bike>(id);
+    return bikeStream;
+}
+```
+
+```csharp
+public class BikeAggregation : SingleStreamProjection<Bike>
+{
+    public Bike Create(BikeRegisteredEvent e) => new Bike { ... };
+    public void Apply(RideLoggedEvent e, Bike bike) => bike.TotalDistance += e.Distance;
+    public void Apply(ComponentAddedEvent e, Bike bike) => bike.Components.Add(...);
+}
+```
+
+*Marten projections rebuild the current state from the event stream.*
+
+---
+
 ## Benefits
 
 - **Full Auditability**: Reconstruct any state at any time
@@ -90,16 +145,10 @@ Event Sourcing, CQRS & Clean Architecture
 
 ---
 
-## Deployment
+## Benefits for Microservices
 
-- **Dockerized**: Consistent, easy setup
-- **PostgreSQL**: Robust, scalable storage
-- **OpenAPI**: Self-documenting REST API
-
----
-
-## Conclusion
-
-- **Bike Wear Tracker** shows event sourcing, CQRS, and Clean Architecture in practice
-- Ideal for domains needing traceability and adaptability
-- Practical reference for modern .NET event-driven apps
+- **Decoupled Services**: Event streams enable loose coupling between services
+- **Scalable Communication**: Services can subscribe to events for integration
+- **Resilience**: Services can rebuild state from events after failures
+- **Autonomous Evolution**: Each service can evolve its own event schema
+- **Audit & Traceability**: End-to-end traceability across service boundaries
